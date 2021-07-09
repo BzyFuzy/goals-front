@@ -1,20 +1,24 @@
 import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import Loading from "../../utils/loading";
 
 const TReportPage = () => {
   const [TReports, setTReports] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-      console.log("here");
+    console.log("here");
     fetchTReports();
   }, []);
 
   const fetchTReports = () => {
+    setLoading(true);
     axios
       .get("https://bzy-goals.herokuapp.com/api/treports/list")
       .then((res) => {
         if (res.data.status === "amjilttai") {
           setTReports(res.data.result);
+          setLoading(false);
         }
       });
   };
@@ -36,7 +40,9 @@ const TReportPage = () => {
   return (
     <div>
       <Create onSubmit={onSubmit} />
-      <List data={TReports} onDelete={onDelete} />
+      <Loading isLoading={loading}>
+        <List data={TReports} onDelete={onDelete} />
+      </Loading>
     </div>
   );
 };
@@ -54,7 +60,7 @@ const List = ({ data, onDelete }) => {
 const Create = ({ onSubmit }) => {
   const [formdata, setFormData] = useState({
     note: "",
-    desc: "",
+    desc: ""
   });
   const submit = (e) => {
     e.preventDefault();
@@ -64,7 +70,7 @@ const Create = ({ onSubmit }) => {
         if (res.data.status === "amjilttai") {
           setFormData({
             note: "",
-            desc: "",
+            desc: ""
           });
           onSubmit(res.data.result);
         }
@@ -80,8 +86,19 @@ const Create = ({ onSubmit }) => {
       onSubmit={submit}
       style={{ display: "flex", flexDirection: "column" }}
     >
-      <input type="text" name="desc" value={formdata.desc} onChange={inputHandler} />
-      <textarea name="note" rows="4" value={formdata.note} cols="50" onChange={inputHandler} />
+      <input
+        type="text"
+        name="desc"
+        value={formdata.desc}
+        onChange={inputHandler}
+      />
+      <textarea
+        name="note"
+        rows="4"
+        value={formdata.note}
+        cols="50"
+        onChange={inputHandler}
+      />
       <input type="submit" value="save" />
     </form>
   );
